@@ -3,6 +3,28 @@ Name: pydrums
 Version: 0.1.0
 Summary: AI-powered drum pattern generation and MIDI conversion
 Author-email: Your Name <your.email@example.com>
+License: MIT License
+        
+        Copyright (c) 2025 PyDrums Contributors
+        
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+        
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+        
 Project-URL: Homepage, https://github.com/yourusername/pydrums
 Project-URL: Repository, https://github.com/yourusername/pydrums
 Project-URL: Documentation, https://github.com/yourusername/pydrums#readme
@@ -20,6 +42,7 @@ Classifier: Topic :: Multimedia :: Sound/Audio :: MIDI
 Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
+License-File: LICENSE
 Requires-Dist: ollama>=0.3.0
 Requires-Dist: mido>=1.3.0
 Requires-Dist: pretty_midi>=0.2.10
@@ -44,6 +67,7 @@ Provides-Extra: docs
 Requires-Dist: PyPDF2>=3.0.0; extra == "docs"
 Requires-Dist: pytesseract>=0.3.10; extra == "docs"
 Requires-Dist: opencv-python>=4.8.0; extra == "docs"
+Dynamic: license-file
 
 # PyDrums 🥁
 
@@ -56,7 +80,6 @@ PyDrums is a comprehensive Python toolkit that uses AI (via Ollama) to generate 
 - 🤖 **AI Pattern Generation**: Uses few-shot learning with Ollama to generate drum patterns from natural language
 - 🎼 **MIDI Conversion**: Convert patterns to standard MIDI files compatible with any DAW
 - 📚 **Professional Training Data**: Built on 200+ professional drum patterns across 15+ musical styles
-- 🎵 **Musical Notation**: Uses industry-standard 6-token notation system (x, -, R, _, [, ])
 - 🔄 **Multiple Data Sources**: Load patterns from GitHub repositories and custom JSON sources
 - 🎮 **Interactive Mode**: Real-time pattern generation with immediate feedback
 - 🛠️ **CLI Tool**: Command-line interface for batch processing and automation
@@ -86,17 +109,23 @@ pip install -e .
 ### Basic Usage
 
 ```bash
-# 1. Setup training data
-pydrums setup-data
+# 1. Setup training data (downloads 268 professional patterns with speed variations)
+pydrums setup-data --skip-primary
 
-# 2. Generate a pattern
-pydrums generate -d "Create a funky rock beat" --to-midi
+# 2. Generate a pattern from 17 available styles with speed control (automatically creates MIDI)
+pydrums generate -d "Create a funky afro-cuban beat"
 
-# 3. Interactive mode
+# 3. Interactive mode - try any of the 17 styles with speed variations!
 pydrums generate --interactive
 
 # 4. Convert pattern string to MIDI
 pydrums convert -p "ch: x-x-x-x-; sd: ----x---; bd: x-----x-"
+
+# 5. Regenerate training data with enhanced speed variations
+pydrums regenerate-training
+
+# 6. Check your expanded dataset
+pydrums info
 ```
 
 ## 📖 Documentation
@@ -115,7 +144,7 @@ PyDrums uses a 6-token notation system:
 ### Drum Abbreviations
 
 - `ch` = Closed Hi-Hat
-- `oh` = Open Hi-Hat  
+- `oh` = Open Hi-Hat
 - `sd` = Snare Drum
 - `bd` = Bass Drum
 - `hh` = Hi-Hat Pedal
@@ -124,6 +153,12 @@ PyDrums uses a 6-token notation system:
 - `ht` = High Tom
 - `mt` = Mid Tom
 - `lt` = Low Tom
+
+### Additional Documentation
+
+- 📊 **[DATASET.md](DATASET.md)**: Comprehensive dataset documentation with detailed style breakdowns and statistics
+- 🎵 **[examples/](examples/)**: Usage examples and tutorials
+- 🛠️ **[.github/copilot-instructions.md](.github/copilot-instructions.md)**: Development guidelines
 
 ### Python API
 
@@ -153,11 +188,39 @@ patterns = loader.load_github_json_patterns()
 
 ## 🔧 Configuration
 
-### Adding Your Own Data Sources
+### Data Source Management
 
 ```bash
-# Add additional JSON pattern source
-pydrums setup-data --additional-url "https://api.github.com/repos/user/repo/contents/patterns" --additional-name "custom_patterns"
+# Setup with all available sources
+pydrums setup-data
+
+# Use only DrumMachinePatterns260 (recommended)
+pydrums setup-data --skip-primary
+
+# Force re-download of all data
+pydrums setup-data --force-reload
+
+# Add your own JSON pattern source
+pydrums setup-data --additional-url "https://raw.githubusercontent.com/user/repo/patterns.json" --additional-name "my_patterns"
+```
+
+### Available Style Examples
+
+```bash
+# Generate patterns from different styles in your dataset
+pydrums generate -d "Create a funk groove with ghost notes"
+pydrums generate -d "Make an afro-cuban pattern"
+pydrums generate -d "Generate a reggae one drop beat"
+pydrums generate -d "Create a jazz shuffle pattern"
+pydrums generate -d "Make a disco four-on-the-floor beat"
+pydrums generate -d "Generate a bossa nova rhythm"
+pydrums generate -d "Create a rock ballad pattern"
+
+# NEW: Speed variation examples
+pydrums generate -d "Create a half-time funk groove"
+pydrums generate -d "Generate a double-time rock beat"
+pydrums generate -d "Make a simple quarter note disco pattern"
+pydrums generate -d "Create a laid-back jazz groove"
 ```
 
 ### Model Selection
@@ -175,7 +238,7 @@ pattern = generator.generate_pattern(
     "Create a complex progressive pattern",
     num_examples=5,        # More examples for better context
     temperature=0.8,       # Higher creativity
-    style_hint="progressive"  # Guide style selection
+    style_hint="funk"      # Guide style selection from 17 available styles
 )
 
 # MIDI with custom settings
@@ -189,29 +252,71 @@ midi_file = converter.pattern_to_midi(
 
 ## 📊 Training Data
 
-PyDrums includes professionally curated drum patterns:
+PyDrums includes professionally curated drum patterns from multiple sources:
 
-- **200+ Patterns**: Across rock, funk, jazz, latin, pop, and more
-- **15+ Styles**: From basic rock to complex progressive patterns
-- **Professional Quality**: Sourced from established drum machine pattern libraries
+### Current Dataset Statistics
+
+- **268 Professional Patterns**: High-quality drum machine patterns
+- **1,331+ AI Training Examples**: Generated from professional patterns with speed variations
+- **17 Musical Styles**: Comprehensive coverage of musical genres
+- **4 Speed Variations**: Normal, half-time, double-time, and quarter-note patterns
+- **Multiple Time Signatures**: 4/4, 12/8, 3/4, and more
 - **JSON Format**: Structured data for reliable AI training
+
+### Speed Variations Available
+
+- **Normal Speed** (16th notes): Standard drum patterns with 16-character resolution
+- **Half-Time** (32nd notes): Slower, laid-back grooves with extended spacing
+- **Double-Time** (8th notes): Fast, energetic patterns with rapid hits
+- **Quarter Notes**: Simple, minimal patterns emphasizing strong beats
+
+### Pattern Length Examples
+
+```
+Normal (16 chars):    ch: x-x-x-x-x-x-x-x-; bd: x---x---x---x---
+Half-time (32 chars): ch: x---x---x---x---x---x---x---x---; bd: x-------x-------x-------x-------
+Double-time (8 chars): ch: xxxxxxxx; bd: x-x-x-x-
+Quarter notes (4 chars): ch: xxxx; bd: xxxx
+```
+
+### Available Musical Styles
+
+1. **Funk** (150 examples) - Syncopated grooves and ghost notes
+2. **Rock** (135 examples) - Classic and modern rock beats
+3. **General** (122 examples) - Versatile patterns for any genre
+4. **Disco** (110 examples) - Four-on-the-floor dance patterns
+5. **Reggae** (105 examples) - One drop and rockers patterns
+6. **Jazz** (90 examples) - Swing and shuffle patterns
+7. **Ballad** (90 examples) - Slow, emotional patterns
+8. **Pop** (90 examples) - Commercial and radio-friendly beats
+9. **R&B** (90 examples) - Soul and rhythm & blues grooves
+10. **Latin** (85 examples) - Salsa, mambo, and cha-cha patterns
+11. **Afro-Cuban** (75 examples) - Traditional African-Cuban rhythms
+12. **Shuffle** (45 examples) - Swung eighth note patterns
+13. **Bossa Nova** (45 examples) - Brazilian jazz patterns
+14. **Blues** (45 examples) - Traditional blues rhythms
+15. **Waltz** (24 examples) - 3/4 time signature patterns
+16. **March** (20 examples) - Military and ceremonial beats
+17. **Tango** (10 examples) - Argentinian tango rhythms
 
 ### Data Sources
 
-1. **Primary**: [stephenhandley/DrumMachinePatterns](https://github.com/stephenhandley/DrumMachinePatterns) - 200 patterns in perfect JSON format
-2. **Secondary**: [montoyamoraga/drum-machine-patterns](https://github.com/montoyamoraga/drum-machine-patterns) - Additional patterns in markdown format
+1. **Primary**: [DrumMachinePatterns260](https://github.com/stephenhandley/DrumMachinePatterns/blob/master/Sources/DrumMachinePatterns260/Patterns.json) - 268 patterns in perfect JSON format
+2. **Legacy**: [stephenhandley/DrumMachinePatterns](https://github.com/stephenhandley/DrumMachinePatterns) - Individual pattern files
+3. **Reference**: [montoyamoraga/drum-machine-patterns](https://github.com/montoyamoraga/drum-machine-patterns) - Additional patterns in markdown format
 
 ## 🧠 How It Works
 
 PyDrums uses **few-shot learning** rather than traditional model training:
 
 1. **Context Loading**: Selects relevant example patterns based on your description
-2. **Prompt Engineering**: Creates structured prompts with notation guides and examples  
+2. **Prompt Engineering**: Creates structured prompts with notation guides and examples
 3. **AI Generation**: Uses Ollama to generate new patterns following the established format
 4. **Validation**: Checks output format and provides fallbacks if needed
 5. **MIDI Conversion**: Converts text patterns to standard MIDI using General MIDI mapping
 
 This approach is:
+
 - ⚡ **Fast**: No training time required
 - 🎯 **Accurate**: Uses proven professional patterns as examples
 - 🔄 **Adaptable**: Easy to add new styles and patterns
@@ -249,7 +354,7 @@ pytest tests/
 # Format code
 black src/ tests/
 
-# Lint code  
+# Lint code
 flake8 src/ tests/
 
 # Type checking
